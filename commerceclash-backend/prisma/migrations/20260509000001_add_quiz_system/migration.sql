@@ -1,0 +1,4 @@
+-- Placeholder: this migration was applied directly to the database.
+-- The SQL it executed is covered by 20260201000000_baseline_full_schema.
+-- This file exists so the shadow database can replay the migration history
+-- without errors.

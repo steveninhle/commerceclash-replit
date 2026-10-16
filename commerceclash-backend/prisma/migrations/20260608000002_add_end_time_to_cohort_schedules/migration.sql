@@ -1,0 +1,1 @@
+ALTER TABLE "cohort_schedules" ADD COLUMN "end_time" VARCHAR(10) NOT NULL DEFAULT '00:00';

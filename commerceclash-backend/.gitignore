@@ -1,0 +1,7 @@
+dist/*
+node_modules
+/generated/prisma
+.env
+.vscode
+certs/
+.DS_Store

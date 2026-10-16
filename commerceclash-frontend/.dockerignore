@@ -1,0 +1,58 @@
+# Dependencies
+node_modules
+npm-debug.log
+
+# Development files
+.env
+.env.local
+.env.development
+.env.test
+.env.production
+
+# Git
+.git
+.gitignore
+.github
+
+# IDE
+.vscode
+.idea
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Build artifacts
+dist
+build
+*.tsbuildinfo
+
+# Documentation
+README.md
+docs
+
+# Test files
+*.test.ts
+*.test.tsx
+*.spec.ts
+*.spec.tsx
+__tests__
+coverage
+
+# CI/CD
+.travis.yml
+.gitlab-ci.yml
+.circleci
+
+# Logs
+logs
+*.log
+
+# Temporary files
+tmp
+temp
+.cache
+
+# Certificates (if using HTTPS in development)
+certs
+*.pem

@@ -1,0 +1,357 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model roles {
+  id         String   @id(map: "role_pkey") @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  created_at DateTime @default(now()) @db.Timestamptz(6)
+  name       String
+  users      users[]
+}
+
+model users {
+  id                String              @id(map: "user_pkey") @db.Uuid
+  email             String              @unique
+  created_at        DateTime            @default(now())
+  updated_at        DateTime            @default(now())
+  name              String?
+  role_id           String              @db.Uuid
+  is_active         Boolean             @default(true)
+  Renamedclass      Renamedclass[]
+  cohort_materials  cohort_materials[]
+  cohort_students   cohort_students[]
+  cohorts           cohorts[]
+  enrolled_students enrolled_students[]
+  roles             roles               @relation(fields: [role_id], references: [id], onDelete: NoAction, map: "user_role_id_fkey")
+}
+
+/// This model has been renamed to 'Renamedclass' during introspection, because the original name 'class' is reserved.
+model Renamedclass {
+  id                String              @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  created_at        DateTime            @default(now()) @db.Timestamptz(6)
+  meeting_id        String
+  name              String
+  meeting_link      String
+  passcode          String?
+  duration          Int?                @db.SmallInt
+  instructor_id     String              @db.Uuid
+  allocated_points  Int?                @default(10) @db.SmallInt
+  is_active         Boolean             @default(false)
+  skill_locked      Boolean             @default(false)
+  start_time        DateTime?           @db.Timestamptz(6)
+  end_time          DateTime?           @db.Timestamptz(6)
+  cohort_id         String?             @db.Uuid
+  cohorts           cohorts?            @relation(fields: [cohort_id], references: [id])
+  users             users               @relation(fields: [instructor_id], references: [id], onDelete: Cascade)
+  enrolled_students enrolled_students[]
+
+  @@map("class")
+}
+
+model attributes {
+  id                 String               @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  created_at         DateTime             @default(now()) @db.Timestamptz(6)
+  name               String
+  value              Int                  @default(0) @db.SmallInt
+  updated_at         DateTime             @default(now()) @db.Timestamptz(6)
+  student_attributes student_attributes[]
+}
+
+model enrolled_students {
+  id                 String               @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  student_id         String               @db.Uuid
+  class_id           String               @db.Uuid
+  created_at         DateTime             @default(now()) @db.Timestamptz(6)
+  available_points   Int?                 @default(10) @db.SmallInt
+  xp                 Int?                 @default(0) @db.SmallInt
+  level              Int?                 @default(1) @db.SmallInt
+  archtype_id        String?              @db.Uuid
+  market_share       Int?                 @default(0) @db.SmallInt
+  is_cancelled       Boolean?             @default(false)
+  skill_unlocked     Boolean?             @default(true)
+  shifting_points    Int?                 @default(0) @db.SmallInt
+  is_shifting        Boolean?             @default(false)
+  archtypes          archtypes?           @relation(fields: [archtype_id], references: [id], onDelete: Cascade)
+  Renamedclass       Renamedclass         @relation(fields: [class_id], references: [id], onDelete: Cascade)
+  users              users                @relation(fields: [student_id], references: [id], onDelete: Cascade)
+  perk_usage         perk_usage[]
+  student_attributes student_attributes[]
+  student_perks      student_perks[]
+
+  @@unique([student_id, class_id])
+}
+
+model student_attributes {
+  id                String            @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  created_at        DateTime          @default(now()) @db.Timestamptz(6)
+  enrollment_id     String            @db.Uuid
+  attribute_id      String            @db.Uuid
+  value             Int               @db.SmallInt
+  updated_at        DateTime          @default(now()) @db.Timestamptz(6)
+  attributes        attributes        @relation(fields: [attribute_id], references: [id], onDelete: Cascade)
+  enrolled_students enrolled_students @relation(fields: [enrollment_id], references: [id], onDelete: Cascade)
+}
+
+model archtypes {
+  id                String              @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  title             String
+  description       String?
+  difficulty        Int                 @db.SmallInt
+  playstyle         String
+  risk              Int                 @db.SmallInt
+  influence         Int                 @db.SmallInt
+  growth            Int                 @db.SmallInt
+  created_at        DateTime            @default(now()) @db.Timestamptz(6)
+  sub_title         String              @default("")
+  enrolled_students enrolled_students[]
+  perks             perks[]
+}
+
+model perk_types {
+  id         String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  type       String
+  created_at DateTime @default(now()) @db.Timestamptz(6)
+  updated_at DateTime @default(now()) @db.Timestamptz(6)
+  perks      perks[]
+}
+
+model perk_usage {
+  id                String            @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  student_perk_id   String            @db.Uuid
+  enrollment_id     String            @db.Uuid
+  used_at           DateTime          @db.Timestamptz(6)
+  result_data       Json              @db.Json
+  created_at        DateTime          @default(now()) @db.Timestamptz(6)
+  enrolled_students enrolled_students @relation(fields: [enrollment_id], references: [id], onDelete: Cascade)
+  student_perks     student_perks     @relation(fields: [student_perk_id], references: [id], onDelete: Cascade)
+}
+
+model perks {
+  id            String          @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  description   String?
+  is_coded      Boolean
+  is_repeatable Boolean
+  auto_approve  Boolean
+  perk_type     String          @db.Uuid
+  created_at    DateTime        @default(now()) @db.Timestamptz(6)
+  key           String          @unique
+  archtype_id   String          @db.Uuid
+  title         String
+  archtypes     archtypes       @relation(fields: [archtype_id], references: [id], onDelete: Cascade)
+  perk_types    perk_types      @relation(fields: [perk_type], references: [id], onDelete: Cascade)
+  student_perks student_perks[]
+}
+
+model student_perks {
+  id                String            @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  enrollment_id     String            @db.Uuid
+  perk_id           String            @db.Uuid
+  is_unlocked       Boolean           @default(false)
+  is_used           Boolean           @default(false)
+  last_used_at      DateTime?         @db.Timestamptz(6)
+  next_available_at DateTime?         @db.Timestamptz(6)
+  updated_at        DateTime          @default(now()) @db.Timestamptz(6)
+  created_at        DateTime          @default(now()) @db.Timestamptz(6)
+  is_approved       Boolean?          @default(false)
+  perk_status       perk_status?
+  perk_usage        perk_usage[]
+  enrolled_students enrolled_students @relation(fields: [enrollment_id], references: [id], onDelete: Cascade)
+  perks             perks             @relation(fields: [perk_id], references: [id], onDelete: Cascade)
+
+  @@unique([enrollment_id, perk_id])
+  @@index([enrollment_id])
+}
+
+model cohorts {
+  id                 String               @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name               String               @db.VarChar(255)
+  slug               String?              @unique @db.VarChar(255)
+  description        String?
+  teacher_id         String?              @db.Uuid
+  status             String               @default("active") @db.VarChar(50)
+  start_date         DateTime?            @db.Timestamptz(6)
+  end_date           DateTime?            @db.Timestamptz(6)
+  timezone           String?              @db.VarChar(100)
+  max_students       Int                  @default(0)
+  is_public          Boolean              @default(false)
+  total_classes      Int                  @default(0)
+  total_students     Int                  @default(0)
+  created_at         DateTime             @default(now()) @db.Timestamptz(6)
+  updated_at         DateTime             @default(now()) @db.Timestamptz(6)
+  archived_at        DateTime?            @db.Timestamptz(6)
+  program_name       String?              @db.VarChar(255)
+  level              String?              @db.VarChar(100)
+  cover_image        String?
+  tags               Json                 @default("[]")
+  current_week       Int                  @default(0)
+  schedule           Json                 @default("{}")
+  total_sessions     Int                  @default(8)
+  zoom_meeting_id    String?              @unique @db.VarChar(50)
+  zoom_uuid          String?              @db.VarChar(100)
+  zoom_join_url      String?
+  zoom_start_url     String?
+  zoom_passcode      String?              @db.VarChar(20)
+  zoom_host_id       String?              @db.VarChar(100)
+  idempotency_key    String?              @unique @db.VarChar(255)
+  class              Renamedclass[]
+  cohort_materials   cohort_materials[]
+  cohort_progression cohort_progression[]
+  cohort_recordings  cohort_recordings[]
+  cohort_schedules   cohort_schedules[]
+  cohort_sessions    cohort_sessions[]
+  cohort_students    cohort_students[]
+  checkout_orders    checkout_orders[]
+  users              users?               @relation(fields: [teacher_id], references: [id])
+
+  @@index([start_date])
+  @@index([status])
+  @@index([teacher_id])
+}
+
+model cohort_schedules {
+  id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  cohort_id   String   @db.Uuid
+  day_of_week Int      @db.SmallInt
+  start_time  String   @db.VarChar(10)
+  created_at  DateTime @default(now()) @db.Timestamptz(6)
+  updated_at  DateTime @default(now()) @db.Timestamptz(6)
+  end_time    String   @default("00:00") @db.VarChar(10)
+  cohorts     cohorts  @relation(fields: [cohort_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@index([cohort_id], map: "idx_cohort_schedules_cohort")
+}
+
+model cohort_progression {
+  id                 String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  cohort_id          String   @db.Uuid
+  week_number        Int
+  total_xp           Int      @default(0)
+  average_level      Decimal  @default(0) @db.Decimal(10, 2)
+  total_market_share Int      @default(0)
+  completion_rate    Decimal  @default(0) @db.Decimal(5, 2)
+  active_students    Int      @default(0)
+  created_at         DateTime @default(now()) @db.Timestamptz(6)
+  updated_at         DateTime @default(now()) @db.Timestamptz(6)
+  cohorts            cohorts  @relation(fields: [cohort_id], references: [id], onDelete: Cascade)
+
+  @@unique([cohort_id, week_number])
+  @@index([cohort_id])
+  @@index([week_number])
+}
+
+model cohort_students {
+  id                   String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  cohort_id            String   @db.Uuid
+  student_id           String   @db.Uuid
+  joined_at            DateTime @default(now()) @db.Timestamptz(6)
+  created_at           DateTime @default(now()) @db.Timestamptz(6)
+  is_new               Boolean  @default(true)
+  current_level        Int      @default(1)
+  current_market_share Decimal  @default(0) @db.Decimal(10, 2)
+  current_xp           Int      @default(0)
+  is_active            Boolean  @default(true)
+  perks                Json     @default("[]")
+  skill_points         Json     @default("{}")
+  cohorts              cohorts  @relation(fields: [cohort_id], references: [id], onDelete: Cascade)
+  users                users    @relation(fields: [student_id], references: [id], onDelete: Cascade)
+
+  @@unique([cohort_id, student_id])
+  @@index([cohort_id])
+  @@index([student_id])
+}
+
+model cohort_sessions {
+  id           String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  cohort_id    String    @db.Uuid
+  week_number  Int
+  unlocked_at  DateTime? @db.Timestamptz(6)
+  locked_at    DateTime? @db.Timestamptz(6)
+  completed_at DateTime? @db.Timestamptz(6)
+  created_at   DateTime  @default(now()) @db.Timestamptz(6)
+  updated_at   DateTime  @default(now()) @db.Timestamptz(6)
+  cohorts      cohorts   @relation(fields: [cohort_id], references: [id], onDelete: Cascade)
+
+  @@unique([cohort_id, week_number])
+  @@index([cohort_id])
+}
+
+model cohort_materials {
+  id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  cohort_id   String   @db.Uuid
+  file_name   String
+  file_url    String
+  uploaded_by String   @db.Uuid
+  created_at  DateTime @default(now()) @db.Timestamptz(6)
+  cohorts     cohorts  @relation(fields: [cohort_id], references: [id], onDelete: Cascade)
+  users       users    @relation(fields: [uploaded_by], references: [id], onDelete: Cascade)
+
+  @@index([cohort_id])
+}
+
+model cohort_recordings {
+  id            String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  cohort_id     String   @db.Uuid
+  title         String
+  recording_url String
+  created_at    DateTime @default(now()) @db.Timestamptz(6)
+  cohorts       cohorts  @relation(fields: [cohort_id], references: [id], onDelete: Cascade)
+
+  @@index([cohort_id])
+}
+
+model stripe_events {
+  id              String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  stripe_event_id String   @unique
+  event_type      String
+  processed_at    DateTime @default(now()) @db.Timestamptz(6)
+  payload         Json?
+  session_id      String?
+  outcome         String   @default("completed")
+
+  @@index([session_id])
+}
+
+model pending_registrations {
+  id                 String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  session_id         String   @unique
+  email              String
+  encrypted_password String
+  cohort_id          String   @db.Uuid
+  expires_at         DateTime @db.Timestamptz(6)
+  created_at         DateTime @default(now()) @db.Timestamptz(6)
+}
+
+model checkout_orders {
+  id                String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  checkout_key      String   @unique @db.Uuid
+  cohort_id         String   @db.Uuid
+  email             String
+  customer_name     String?
+  cohort_name       String
+  amount            Int
+  currency          String
+  attempt           Int      @default(1)
+  payment_intent_id String?  @unique
+  seat_reserved     Boolean  @default(false)
+  reservation_expires_at DateTime? @db.Timestamptz(6)
+  fulfilled_at      DateTime? @db.Timestamptz(6)
+  created_at        DateTime @default(now()) @db.Timestamptz(6)
+  cohorts           cohorts  @relation(fields: [cohort_id], references: [id], onDelete: Restrict)
+
+  @@unique([cohort_id, email])
+  @@index([cohort_id, seat_reserved])
+  @@index([reservation_expires_at])
+}
+
+enum perk_status {
+  pending
+  approved
+  denied
+  used
+}

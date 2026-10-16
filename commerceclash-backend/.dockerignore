@@ -1,0 +1,90 @@
+# Node.js dependencies
+node_modules/
+npm-debug.log
+yarn-debug.log
+yarn-error.log
+.pnpm-debug.log
+
+# NestJS build output
+/dist
+/build
+
+# Docker files
+Dockerfile*
+docker-compose*
+.dockerignore
+
+# Git and GitHub
+.git
+.gitignore
+.github
+README.md
+LICENSE
+*.md
+
+# Development and testing
+/test
+/coverage
+.nyc_output
+.vscode
+.idea
+*.sublime-*
+
+# Environment variables
+.env
+.env.*
+!.env.example
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+
+# Temporary files
+.tmp
+.temp
+*.swp
+*.swo
+
+# Cache directories
+.npm
+.eslintcache
+.stylelintcache
+.cache
+.parcel-cache
+
+# Project specific
+nodemon.json
+nodemon-debug.json
+
+# Editor directories and files
+.idea/
+.project
+.classpath
+.c9/
+*.launch
+.settings/
+*.sublime-workspace
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+
+# Serverless directories
+.serverless/
+
+# Other
+.DS_Store
+.directory
+
+# Local configuration
+*.local
+local.*

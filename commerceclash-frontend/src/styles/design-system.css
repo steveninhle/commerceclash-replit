@@ -1,0 +1,248 @@
+@theme {
+  /* Primary — Teal/Green */
+  --color-primary-50: #ecfdf9;
+  --color-primary-100: #d1fae5;
+  --color-primary-150: #53f8cb;
+  --color-primary-200: #a7f3d0;
+  --color-primary-300: #6ee7b7;
+  --color-primary-400: #34d399;
+  --color-primary-500: #39b899;
+  --color-primary-600: #217460;
+  --color-primary-700: #1b5e50;
+  --color-primary-800: #134e43;
+  --color-primary-900: #0f3f36;
+  --color-primary-950: #072822;
+
+  /* Secondary — Blue */
+  --color-secondary-50: #eff6ff;
+  --color-secondary-100: #dbeafe;
+  --color-secondary-200: #bfdbfe;
+  --color-secondary-300: #93c5fd;
+  --color-secondary-400: #60a5fa;
+  --color-secondary-500: #2d8cff;
+  --color-secondary-600: #1a6fd4;
+  --color-secondary-700: #1e5bb8;
+  --color-secondary-800: #193cb8;
+  --color-secondary-900: #1e3a78;
+  --color-secondary-950: #172554;
+
+  /* Success */
+  --color-success-50: #ecfdf5;
+  --color-success-100: #dcfce7;
+  --color-success-200: #a7f3d0;
+  --color-success-300: #6ee7b7;
+  --color-success-400: #34d399;
+  --color-success-500: #10b981;
+  --color-success-600: #059669;
+  --color-success-700: #047857;
+  --color-success-800: #016630;
+  --color-success-900: #064e3b;
+  --color-success-950: #022c22;
+
+  /* Warning */
+  --color-warning-50: #fffbeb;
+  --color-warning-100: #fef3c7;
+  --color-warning-200: #fde68a;
+  --color-warning-300: #fcd34d;
+  --color-warning-400: #fbbf24;
+  --color-warning-500: #f59e0b;
+  --color-warning-600: #d97706;
+  --color-warning-700: #b45309;
+  --color-warning-800: #92400e;
+  --color-warning-900: #78350f;
+  --color-warning-950: #451a03;
+
+  /* Danger */
+  --color-danger-50: #fef2f2;
+  --color-danger-100: #ffe2e2;
+  --color-danger-200: #fecaca;
+  --color-danger-300: #fca5a5;
+  --color-danger-400: #f87171;
+  --color-danger-500: #ef4444;
+  --color-danger-600: #dc2626;
+  --color-danger-700: #b91c1c;
+  --color-danger-800: #9f0712;
+  --color-danger-900: #7f1d1d;
+  --color-danger-950: #450a0a;
+
+  /* Neutral */
+  --color-neutral-50: #f9fafb;
+  --color-neutral-100: #f3f4f6;
+  --color-neutral-200: #e5e7eb;
+  --color-neutral-250: #2a3038;
+  --color-neutral-300: #d1d5dc;
+  --color-neutral-400: #a3a3a3;
+  --color-neutral-500: #6a7282;
+  --color-neutral-600: #364153;
+  --color-neutral-700: #404040;
+  --color-neutral-800: #1e2939;
+  --color-neutral-900: #1a1a1a;
+  --color-neutral-950: #0a0a0a;
+
+  /* Black */
+  --color-black-50: #242424;
+  --color-black-100: #0c121a;
+  --color-black-200: #1a3a35;
+  --color-black-250: #0d2925;
+  --color-black-300: #d1d5dc;
+  --color-black-400: #a3a3a3;
+  --color-black-500: #6a7282;
+  --color-black-600: #364153;
+  --color-black-700: #404040;
+  --color-black-800: #1e2939;
+  --color-black-900: #1a1a1a;
+  --color-black-950: #0a0a0a;
+
+  /* BRAND COLORS */
+  --color-input-dark: #0c121a;
+  --color-brand-accent: #a4f9f8;
+  --color-xp-bright: #56ffd0;
+
+  /* FONTS */
+  --font-karantina: "Karantina", cursive;
+  --font-gothic-condensed: "Special Gothic Condensed One", sans-serif;
+
+  /* ANIMATION */
+  --animate-fade-in: fade-in 0.25s ease-out both;
+  --animate-zoom-in: zoom-in 0.25s ease-out both;
+  --animate-slide-up: slide-up 0.3s ease-out both;
+
+  /* BACKGROUND IMAGES */
+  --background-image-baron: radial-gradient(
+    182.19% 50% at 50% 50%,
+    #850000 0%,
+    #1f0000 100%
+  );
+  --background-image-visionary: radial-gradient(
+    182.19% 50% at 50% 50%,
+    #260012 0%,
+    #3a001c 100%
+  );
+  --background-image-diplomat: radial-gradient(
+    182.19% 50% at 50% 50%,
+    #490085 0%,
+    #11001f 100%
+  );
+  --background-image-explorer: radial-gradient(
+    182.19% 50% at 50% 50%,
+    #304100 0%,
+    #171f00 100%
+  );
+  --background-image-tycoon: radial-gradient(
+    182.19% 50% at 50% 50%,
+    #af8934 0%,
+    #271b00 100%
+  );
+  --background-image-general: radial-gradient(
+    182.19% 50% at 50% 50%,
+    #000a3f 0%,
+    #000627 100%
+  );
+  --background-image-shadow: radial-gradient(
+    182.19% 50% at 50% 50%,
+    #386488 0%,
+    #0e1922 100%
+  );
+  --background-image-maverick: radial-gradient(
+    182.19% 50% at 50% 50%,
+    #8e3900 0%,
+    #281000 100%
+  );
+  --background-image-phoenix: radial-gradient(
+    182.19% 50% at 50% 50%,
+    #7f3300 0%,
+    #190a00 100%
+  );
+
+  --background-image-showman: radial-gradient(
+    182.19% 50% at 50% 50%,
+    #004913 0%,
+    #001706 100%
+  );
+  --background-image-oracle: radial-gradient(
+    182.19% 50% at 50% 50%,
+    #00988f 0%,
+    #00322f 100%
+  );
+  --background-image-architect: radial-gradient(
+    182.19% 50% at 50% 50%,
+    #56009a 0%,
+    #390066 100%
+  );
+}
+
+@utility container {
+  margin-inline: auto;
+  padding-inline: 1rem;
+  width: 100%;
+}
+
+/*BRAND UTILITIES  */
+
+@utility text-brand-gradient {
+  background: linear-gradient(
+    180deg,
+    #e8eef2,
+    #c5d5de,
+    #8fafc0,
+    #b8cdd8,
+    #7a9aaa,
+    #4a6a7a
+  );
+  -webkit-background-clip: text;
+  color: transparent;
+}
+
+@utility input-dark {
+  background-color: #0c121a;
+  color: white;
+}
+
+/* Neutral embossed-metal text, used for high-contrast display titles (e.g. perk names) */
+@utility text-metal-gradient {
+  background: linear-gradient(180deg, #ffffff 0%, #cfcfcf 45%, #8a8a8a 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* Glowing accent text — reads --glow-color custom property so any per-CEO theme color works */
+@utility text-accent-glow {
+  background: radial-gradient(
+    circle,
+    color-mix(in srgb, var(--glow-color, #ff0000) 55%, white) 0%,
+    var(--glow-color, #ff0000) 100%
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* White-to-flame-orange text, used for the "Skill Investments" style display heading */
+@utility text-flame-gradient {
+  background: linear-gradient(180deg, #ffffff 20%, #ff7a4e 85%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+@min-width 1440px {
+  .dashboard-outer {
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #000;
+  }
+}
+
+@max-width 1440px {
+  .dashboard-inner {
+    width: 1440px;
+    height: 940px;
+    flex-shrink: 0;
+    transform: scale(var(--scale-factor));
+    transform-origin: center center;
+  }
+}

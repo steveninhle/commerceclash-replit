@@ -1,0 +1,587 @@
+@import url("https://fonts.googleapis.com/css2?family=Roboto+Slab:wght@100..900&family=Cinzel:wght@400;700;900&family=Special+Gothic+Condensed+One&family=Karantina:wght@300;400;700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Roboto+Slab:wght@100..900&family=Cinzel:wght@400;700;900&family=Karantina:wght@300;400;700&family=Special+Gothic+Condensed+One&display=swap");
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "tailwind-scrollbar-hide/v4";
+@import "./styles/design-system.css";
+
+@custom-variant dark (&:is(.dark *));
+
+body {
+  margin: 0;
+  font-family:
+    -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu",
+    "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
+  font-family: "Montserrat", sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+html,
+body {
+  min-width: 0 !important;
+}
+
+::-webkit-scrollbar {
+  width: 3px;
+  height: 3px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
+@utility trajan-uppercase {
+  font-family: "Times New Roman", Times, Georgia, serif;
+}
+
+@layer utilities {
+  .trajan-uppercase {
+    font-family: "Times New Roman", Times, Georgia, serif;
+  }
+
+  .trajan-normal {
+    font-family: "Times New Roman", Times, Georgia, serif;
+    text-transform: none;
+  }
+}
+
+/* ==========  ZOOM SIDEBAR VARIABLES  ========== */
+:root {
+  --zoom-sidebar-width: 650px;
+  --zoom-active-sidebar-width: 0px; /* updated by JS on sidebar toggle */
+}
+
+@media (min-width: 1800px) {
+  :root {
+    --zoom-sidebar-width: 750px;
+  }
+}
+
+/*
+ * Width is set frame-by-frame in JS (zoom.tsx) via element.style.width so
+ * the inline value wins the cascade and the SDK's ResizeObserver fires with
+ * the correct clientWidth on every animation frame → tiles rescale smoothly.
+ * We only need overflow:hidden here so content doesn't spill during the tween.
+ */
+#zmmtg-root {
+  overflow: hidden !important;
+  padding-top: 8px;
+}
+p {
+  margin: 0 !important;
+}
+/* ==========  ZOOM LAYOUT  ========== */
+#zoom-root {
+  display: flex;
+  width: 100%;
+  height: 100vh;
+  overflow: hidden;
+  background: #1a1a1a;
+  all: initial;
+}
+
+#zoom-col {
+  flex: 1;
+  min-width: 0;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /*
+   * Use margin-right instead of transform so the actual rendered width shrinks.
+   * transform only visually shifts the column — the SDK still renders at full width.
+   * margin-right makes flex recompute the element's width, so the SDK gets the right size.
+   */
+  margin-right: 0;
+  transition: margin-right 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* Sidebar open: shrink video column by sidebar width */
+#zoom-root:not(.sidebar-collapsed) #zoom-col {
+  margin-right: var(--zoom-sidebar-width);
+}
+
+/* Fade in when video is ready */
+#zoom-col.video-ready {
+  opacity: 1;
+  pointer-events: auto;
+  animation: zoom-fade-in 0.45s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+@keyframes zoom-fade-in {
+  from {
+    opacity: 0;
+    scale: 0.98;
+  }
+  to {
+    opacity: 1;
+    scale: 1;
+  }
+}
+
+#meetingSDKElement {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+}
+
+.shape-outer {
+  display: flex;
+  flex-shrink: 0;
+  background-image: linear-gradient(to right, #39b899, #217460);
+}
+.shape-inner {
+  background: linear-gradient(to right, #288673, #10433a);
+  margin: auto;
+}
+
+.bevel {
+  -webkit-clip-path: polygon(
+    5% 0%,
+    80% 0%,
+    100% 20%,
+    100% 80%,
+    80% 100%,
+    20% 100%,
+    0% 80%,
+    0% 20%
+  );
+  clip-path: polygon(
+    7% 0%,
+    93% 0%,
+    100% 24%,
+    100% 76%,
+    93% 100%,
+    7% 100%,
+    0% 76%,
+    0% 24%
+  );
+}
+
+/* ==========  SIDEBAR (CONTENT-COL)  ========== */
+#content-col {
+  position: fixed;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  width: var(--zoom-sidebar-width);
+  z-index: 2000;
+  overflow: hidden;
+  transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: -6px 0 32px rgba(0, 0, 0, 0.6);
+}
+
+#content-col.collapsed {
+  transform: translateX(100%);
+}
+
+/* Mobile backdrop overlay */
+.sidebar-backdrop {
+  display: none;
+}
+
+/* ==========  SIDEBAR TOGGLE BUTTON  ========== */
+.sidebar-toggle-btn {
+  position: fixed;
+  top: 50%;
+  right: 0;
+  transform: translateY(-50%);
+  z-index: 2001;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  background: linear-gradient(180deg, #2d8cff 0%, #1a6fd4 100%);
+  color: white;
+  border: none;
+  border-radius: 10px 0 0 10px;
+  padding: 14px 8px;
+  cursor: pointer;
+  transition:
+    transform 0.35s cubic-bezier(0.4, 0, 0.2, 1),
+    background 0.2s ease,
+    box-shadow 0.2s ease;
+  box-shadow: -3px 0 12px rgba(45, 140, 255, 0.35);
+}
+
+.sidebar-toggle-btn:hover {
+  background: linear-gradient(180deg, #4a9fff 0%, #2478e8 100%);
+  box-shadow: -3px 0 18px rgba(45, 140, 255, 0.55);
+}
+
+.sidebar-toggle-btn:active {
+  transform: translateY(-50%) scaleY(0.96);
+}
+
+/* Vertical label shown when collapsed */
+.sidebar-btn-label {
+  writing-mode: vertical-rl;
+  text-orientation: mixed;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  opacity: 0.85;
+  line-height: 1;
+}
+
+.label-text-choose-ceo {
+  background: linear-gradient(180deg, #C6C6C6 0%, #B99033 100%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Pulse ring to attract attention when sidebar is first closed */
+.sidebar-toggle-btn.collapsed::before {
+  content: "";
+  position: absolute;
+  inset: -4px;
+  border-radius: 10px 0 0 10px;
+  border: 2px solid #2d8cff;
+  opacity: 0;
+  animation: sidebar-pulse 2.5s ease-out 1s 3;
+}
+
+@keyframes sidebar-pulse {
+  0% {
+    opacity: 0.7;
+    transform: scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.15);
+  }
+}
+
+.sidebar-toggle-btn.collapsed {
+  transform: translateY(-50%);
+}
+
+#zoom-root:not(.sidebar-collapsed) .sidebar-toggle-btn {
+  transform: translateY(-50%) translateX(calc(-1 * var(--zoom-sidebar-width)));
+}
+
+/* ==========  RESPONSIVE  ========== */
+@media (max-width: 767px) {
+  #content-col {
+    width: 100vw;
+  }
+
+  /* Semi-transparent backdrop on mobile */
+  .sidebar-backdrop {
+    display: block;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 1999;
+    backdrop-filter: blur(2px);
+  }
+
+  .sidebar-toggle-btn {
+    right: 0;
+    top: auto;
+    bottom: 12px;
+    padding: 14px 10px;
+    border-radius: 10px 0 0 10px;
+    transform: none;
+  }
+
+  /* Reset transform for collapsed state on mobile (overrides non-media .collapsed rule) */
+  .sidebar-toggle-btn.collapsed {
+    transform: none;
+  }
+
+  /* Override high-specificity desktop rule: on mobile keep button visible on top of sidebar */
+  #zoom-root:not(.sidebar-collapsed) .sidebar-toggle-btn {
+    right: 0;
+    transform: none;
+  }
+}
+
+iframe#webpack-dev-server-client-overlay {
+  display: none !important;
+}
+
+@theme inline {
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+}
+
+:root {
+  --radius: 0.625rem;
+  --background: oklch(1 0 0);
+  --foreground: oklch(0.145 0 0);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.145 0 0);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.145 0 0);
+  --primary: oklch(0.205 0 0);
+  --primary-foreground: oklch(0.985 0 0);
+  --secondary: oklch(0.97 0 0);
+  --secondary-foreground: oklch(0.205 0 0);
+  --muted: oklch(0.97 0 0);
+  --muted-foreground: oklch(0.556 0 0);
+  --accent: oklch(0.97 0 0);
+  --accent-foreground: oklch(0.205 0 0);
+  --destructive: oklch(0.577 0.245 27.325);
+  --border: oklch(0.922 0 0);
+  --input: oklch(0.922 0 0);
+  --ring: oklch(0.708 0 0);
+  --chart-1: oklch(0.646 0.222 41.116);
+  --chart-2: oklch(0.6 0.118 184.704);
+  --chart-3: oklch(0.398 0.07 227.392);
+  --chart-4: oklch(0.828 0.189 84.429);
+  --chart-5: oklch(0.769 0.188 70.08);
+  --sidebar: oklch(0.985 0 0);
+  --sidebar-foreground: oklch(0.145 0 0);
+  --sidebar-primary: oklch(0.205 0 0);
+  --sidebar-primary-foreground: oklch(0.985 0 0);
+  --sidebar-accent: oklch(0.97 0 0);
+  --sidebar-accent-foreground: oklch(0.205 0 0);
+  --sidebar-border: oklch(0.922 0 0);
+  --sidebar-ring: oklch(0.708 0 0);
+}
+
+.dark {
+  --background: oklch(0.145 0 0);
+  --foreground: oklch(0.985 0 0);
+  --card: oklch(0.205 0 0);
+  --card-foreground: oklch(0.985 0 0);
+  --popover: oklch(0.205 0 0);
+  --popover-foreground: oklch(0.985 0 0);
+  --primary: oklch(0.922 0 0);
+  --primary-foreground: oklch(0.205 0 0);
+  --secondary: oklch(0.269 0 0);
+  --secondary-foreground: oklch(0.985 0 0);
+  --muted: oklch(0.269 0 0);
+  --muted-foreground: oklch(0.708 0 0);
+  --accent: oklch(0.269 0 0);
+  --accent-foreground: oklch(0.985 0 0);
+  --destructive: oklch(0.704 0.191 22.216);
+  --border: oklch(1 0 0 / 10%);
+  --input: oklch(1 0 0 / 15%);
+  --ring: oklch(0.556 0 0);
+  --chart-1: oklch(0.488 0.243 264.376);
+  --chart-2: oklch(0.696 0.17 162.48);
+  --chart-3: oklch(0.769 0.188 70.08);
+  --chart-4: oklch(0.627 0.265 303.9);
+  --chart-5: oklch(0.645 0.246 16.439);
+  --sidebar: oklch(0.205 0 0);
+  --sidebar-foreground: oklch(0.985 0 0);
+  --sidebar-primary: oklch(0.488 0.243 264.376);
+  --sidebar-primary-foreground: oklch(0.985 0 0);
+  --sidebar-accent: oklch(0.269 0 0);
+  --sidebar-accent-foreground: oklch(0.985 0 0);
+  --sidebar-border: oklch(1 0 0 / 10%);
+  --sidebar-ring: oklch(0.556 0 0);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-none;
+  }
+  button,
+  [role="button"] {
+    cursor: pointer;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+  ::selection {
+    background-color: rgba(34, 197, 94, 0.35);
+    color: #ffffff;
+  }
+}
+
+.loading-gradient svg {
+  filter: brightness(0) saturate(100%) invert(65%) sepia(72%) saturate(500%)
+    hue-rotate(70deg) brightness(105%);
+}
+
+button:not(:disabled),
+[role="button"]:not(:disabled) {
+  cursor: pointer !important;
+}
+
+@utility scrollbar-hidden {
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+@keyframes shine {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-6px);
+  }
+}
+
+@keyframes cta-pulse {
+  0%,
+  100% {
+    filter: drop-shadow(0 0 0 rgba(255, 255, 255, 0));
+  }
+  50% {
+    filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.45));
+  }
+}
+
+.skill-badge-text {
+  text-align: center !important;
+  color: white !important;
+  font-size: 12px !important;
+  line-height: 22px !important;
+  font-weight: 600 !important;
+  letter-spacing: -0.11px !important;
+  font-family: geo !important;
+}
+.small-scroll::-webkit-scrollbar {
+  width: 5px; /* Thin scrollbar */
+}
+.small-scroll::-webkit-scrollbar-thumb {
+  @apply rounded-lg bg-gray-400;
+}
+
+.small-scroll::-webkit-scrollbar-track {
+  @apply bg-gray-200;
+}
+
+/* ═══════════  ZOOM SDK INNER LAYOUT — responsive to sidebar  ═══════════
+ * The SDK sets pixel widths/positions as inline styles based on root size.
+ * Strategy:
+ *  1. Force every canvas wrapper to width:100% so it tracks #zmmtg-root.
+ *  2. Switch the thumbnail strip from absolute-pixel layout to flexbox
+ *     so tiles auto-centre without needing SDK pixel recalculation.
+ *  3. Force the active-speaker frame to fill the remaining height.
+ * ════════════════════════════════════════════════════════════════════════ */
+
+/* Unnamed canvas div that wraps both thumbnail strip + active speaker */
+video-player-container > div > div {
+  width: 100% !important;
+}
+
+/* Screen-share split layout */
+#video-share-layout
+  > div
+  > div.Pane.horizontal.Pane2
+  > div
+  > video-player-container
+  > div
+  > div:nth-child(2) {
+  width: 100% !important;
+}
+
+/* ── Thumbnail strip: flexbox so tiles auto-centre on any container width ── */
+.speaker-bar-container__horizontal-view-wrap {
+  width: 100% !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 4px !important;
+}
+
+/* Pull thumbnail frames out of absolute-pixel positioning into flex flow */
+.speaker-bar-container__video-frame {
+  position: relative !important;
+  left: auto !important;
+  top: auto !important;
+  flex-shrink: 0;
+}
+
+/* ── Active speaker area: fill all remaining space ── */
+.speaker-active-container__wrap {
+  width: 100% !important;
+  height: 100% !important;
+}
+
+.speaker-active-container__video-frame {
+  width: 100% !important;
+  left: 0 !important;
+}
+
+.speaker-active-container__video-frame video-player {
+  width: 100% !important;
+  height: 100% !important;
+}
+
+/* Gallery view */
+.gallery-video-container__main-view {
+  width: 100% !important;
+}
+
+.video-avatar-container {
+  max-width: 100% !important;
+}
+.video-avatar__avatar-title {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.join-dialog {
+  background-color: transparent !important;
+}
+
+#wc-content {
+    margin-top: 10px !important;
+}

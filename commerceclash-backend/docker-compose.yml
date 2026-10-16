@@ -1,0 +1,29 @@
+# This is Only for Local Devolpment Purposes.
+services:
+  nestjs-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: commerce-clash
+    restart: unless-stopped
+    ports:
+      - '${PORT}:${PORT}'
+    environment:
+      - NODE_ENV=production
+      - PORT=${PORT}
+    volumes:
+      - ./logs:/app/logs
+    healthcheck:
+      test:
+        [
+          'CMD',
+          'bun',
+          'run',
+          '--bun',
+          '-e',
+          "fetch('http://localhost:${PORT}/system/health').then(r => r.ok ? process.exit(0) : process.exit(1)).catch(() => process.exit(1))",
+        ]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
